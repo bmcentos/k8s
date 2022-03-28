@@ -34,7 +34,8 @@ for host in `sudo kubectl get node| egrep -v 'NAME|control'| cut -d " " -f1`
         echo "[+] Atualizando node - $host"
         sudo kubectl drain $host --ignore-daemonsets --delete-emptydir-data --ignore-errors
         scp kubernetes.repo $host:/tmp
-        scp yum.conf $host:/tmp
+        #Caso precise equiparar o yum.config das maquinas
+        #scp yum.conf $host:/tmp
         ssh $host 'sudo cp /tmp/kubernetes.repo /etc/yum.repos.d/kubernetes.repo'
         ssh $host 'sudo cp /tmp/yum.conf /etc/yum.conf'
         ssh $host 'sudo yum repolist'
