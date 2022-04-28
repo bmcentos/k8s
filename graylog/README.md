@@ -20,3 +20,18 @@
 """
 
                               
+
+ 
+<!--  ### Instalação do Falco -->
+ 
+ Instalar em todos os Nós do Kubernetes:
+ yum -y install kernel-devel-$(uname -r)![image](https://user-images.githubusercontent.com/25855270/165816307-fc5586f6-ac09-41c1-84a7-54607c2bfe4b.png)
+
+ #Instalar o Falco:
+ 
+ helm install falco falcosecurity/falco --set falco.docker.enabled=false --set falco.jsonOutput=true --set falcosidekick.enabled=true --set falcosidekick.webui.enabled=true -n falco
+
+ Adicionando Regra de acesso ao Shell no Graylog
+ 
+ "Notice A shell was spawned in a container with an attached terminal"
+ ![image](https://user-images.githubusercontent.com/25855270/165816476-916efdd0-2fcd-4bc6-98c4-9a484e5ae824.png)
