@@ -1,6 +1,6 @@
 ###Esse Playbook visa atualizar os pacotes do sistema operacional do cluster###
 ###Apenas os pacotes listados nas atualizações de segurança serão atualizados###
-- hosts: k8s-poc #Alterar o host group conforme sua lista de hosts
+- hosts: k8s-poc
   become: yes
   serial: 1
   vars_prompt:
@@ -27,6 +27,8 @@
     - name: Dain node {{ inventory_hostname }}
       command: kubectl drain {{ inventory_hostname }} --ignore-daemonsets --delete-emptydir-data
       delegate_to: "{{ master }}"
+      when: result.rc == 1
+
 
 #    - name: Dain node {{ inventory_hostname }}
 #      kubernetes.core.k8s_drain:
@@ -35,11 +37,14 @@
 #        delete_options:
 #          terminate_grace_period: 300
 #
-    - name: wait for pods to come up
+    - name: Aguarda os pods ficarem disponiveis
       shell: kubectl get pods -n kube-system -o json
       register: kubectl_get_pods
+      #Aguarda os pods ficarem com status Rinning no namespace Kubesystem
       until: kubectl_get_pods.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]
       delegate_to: "{{ master }}"
+      retries: 5
+      delay: 10
 
 
     - name: Reiniciando o sistema
@@ -63,6 +68,12 @@
     - name: Uncordon node {{ inventory_hostname }}
       command: kubectl uncordon {{ inventory_hostname }}
       delegate_to: "{{ master }}"
+      when: result.rc == 1
+
+      #Para usar o Modulo Kubernetes
+      #ansible-galaxy collection install community.kubernetes
+      #ansible-galaxy collection install cloud.common
+
 #    - name: Uncordon node {{ inventory_hostname }}
 #      kubernetes.core.k8s_drain:
 #        state: uncordon
